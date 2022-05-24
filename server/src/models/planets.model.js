@@ -41,7 +41,7 @@ function loadPlanetsData(){
   .on('data', (data) => {
     if (isHabitablePlanet(data)) {
       habitablePlanets.push(data);
-    }
+    }    
   })
   .on('error', (err) => {
     console.log(err);
@@ -54,10 +54,14 @@ function loadPlanetsData(){
 });
 }
 
+ function getAllPlanets(){
 
+  return habitablePlanets;
+}
 
 
   module.exports ={
       loadPlanetsData,
-    planets:habitablePlanets,
+      planets:habitablePlanets,
+    //getAllPlanets,
   }
