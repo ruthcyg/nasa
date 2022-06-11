@@ -10,5 +10,8 @@ keplerName:{
     },
 
 });
-
+//const Planet =mongoose.model("Planet", planetSchema)
 module.exports= mongoose.model("Planet", planetSchema)
+// module.exports = {
+//   Planet,
+// }

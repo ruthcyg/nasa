@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require ("path")
 
 const { parse } = require('csv-parse');
+const planets = require("./planets.mongo");
 
 
-const habitablePlanets = [];
 
 function isHabitablePlanet(planet) {
   return planet['koi_disposition'] === 'CONFIRMED'
@@ -12,23 +12,6 @@ function isHabitablePlanet(planet) {
     && planet['koi_prad'] < 1.6;
 }
 
-/*
-
-we are solving a problem that occur when use creatstream 
-because when we do exports to other file it automatically load
-even our data has not stream that will makes us get empty array 
-in order to avoid loading empty data we used the following :
-
-const promise = new Promise ((resolve, reject) =>{
-    resolve(42);
-});
-promise.then((result) => {});
-
-or we can used await this make our code to wait for our data to load before continuing
-const result = await promise;
-
-*/
-/////this is very important
 
 
 function loadPlanetsData(){
@@ -38,30 +21,54 @@ function loadPlanetsData(){
     comment: '#',
     columns: true,
   }))
-  .on('data', (data) => {
-    if (isHabitablePlanet(data)) {
-      habitablePlanets.push(data);
-    }    
+  .on('data',async (data) => {
+    if (isHabitablePlanet (data)) {
+      // TODO: Replace below create with insert + update = upsert
+     
+      // await planets.create({
+      //   name: data.kepler_name,
+      // });
+savePlanet(data)
+    }
   })
   .on('error', (err) => {
     console.log(err);
     reject(err)
   })
-  .on('end', () => {
-    console.log(`${habitablePlanets.length} habitable planets found!`);
+  .on('end', async() => {
+    const countPlanetsFound = (await getAllPlanets()).length; 
+    console.log(`${countPlanetsFound} habitable planets found!`);
     resolve();
   });
 });
 }
 
- function getAllPlanets(){
-
-  return habitablePlanets;
+ async function getAllPlanets(){
+return await planets.find({}, {
+  '_id': 0, '__v': 0,
+});
+  
 }
 
+async function savePlanet (planet){
+  try{
+  await planets.updateOne({
+    keplerName: planet.kepler_name,
+         }, 
+        //  {
+        //    keplerName: planet.kepler_name,
+        //  },
+          {
+           upsert: true,
+         });
+        }catch(err){
+       console.log(` Could not save a planet ${err}`);
+        }
+       } 
 
-  module.exports ={
+
+module.exports ={
       loadPlanetsData,
-      planets:habitablePlanets,
-    //getAllPlanets,
+     // planets:habitablePlanets,
+    getAllPlanets,
   }
