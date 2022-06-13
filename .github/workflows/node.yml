@@ -1,4 +1,4 @@
-name: NASA Project CI
+name: nasa
 on:
   pull_request:
   push:
