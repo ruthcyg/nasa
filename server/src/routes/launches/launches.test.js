@@ -1,4 +1,3 @@
-
 const request = require('supertest');
 const app = require('../../app');
 const { 
@@ -12,7 +11,7 @@ const {
 describe('Launches API', () => {
   beforeAll(async () => {
     await mongoConnect();
-   /// await loadPlanetsData();
+  //  await loadPlanetsData();
   });
 
   afterAll(async () => {
